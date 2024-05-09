@@ -36,8 +36,6 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
-        
-        
         requestPermission()
     }
     
