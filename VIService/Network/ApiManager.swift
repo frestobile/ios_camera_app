@@ -129,7 +129,6 @@ class ApiManager {
                 case .failure(let error):
                     completion(.failure(error))
             }
-            print("API result:  \(result)")
         }
 
     }

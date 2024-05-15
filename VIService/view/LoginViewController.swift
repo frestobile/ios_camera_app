@@ -79,45 +79,28 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
         
-        if #available(iOS 14, *) {
-            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-                switch status {
-                    case .authorized:
-                        // Permission granted, you can access the photo library
-                        print("Photo library access granted")
-                    case .denied, .restricted:
-                        // Permission denied, handle accordingly
-                        print("Photo library access denied")
-                    case .notDetermined:
-                        // The user has not yet made a choice
-                        print("Photo library access not determined")
-                    case .limited:
-                        print("Photo library access limited")
-                    @unknown default:
-                            fatalError()
-                }
-            }
-        } else {
-            // Fallback on earlier versions
-        }
-        
-//        PHPhotoLibrary.requestAuthorization { status in
-//            switch status {
-//                case .authorized:
-//                    // Permission granted, you can access the photo library
-//                    print("Photo library access granted")
-//                case .denied, .restricted:
-//                    // Permission denied, handle accordingly
-//                    print("Photo library access denied")
-//                case .notDetermined:
-//                    // The user has not yet made a choice
-//                    print("Photo library access not determined")
-//                case .limited:
-//                    print("Photo library access limited")
-//            @unknown default:
-//                    fatalError()
+//        if #available(iOS 14, *) {
+//            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+//                switch status {
+//                    case .authorized:
+//                        // Permission granted, you can access the photo library
+//                        print("Photo library access granted")
+//                    case .denied, .restricted:
+//                        // Permission denied, handle accordingly
+//                        print("Photo library access denied")
+//                    case .notDetermined:
+//                        // The user has not yet made a choice
+//                        print("Photo library access not determined")
+//                    case .limited:
+//                        print("Photo library access limited")
+//                    @unknown default:
+//                            fatalError()
+//                }
 //            }
+//        } else {
+//            // Fallback on earlier versions
 //        }
+        
 
     }
     
@@ -155,7 +138,6 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         
         ApiManager.shared.deviceLogin(id: deviceId, password: password) { (result) in
             MBProgressHUD.hide(for: self.view, animated: true)
-            
             switch result {
             case .success(let response):
                 if response.error {

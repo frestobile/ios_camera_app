@@ -35,7 +35,7 @@ class CarNumberViewController: UIViewController {
         companyLogo.loadImage(fromURL: imageURL)
     }
     
-    
+    // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         nextButton.layer.cornerRadius = 1

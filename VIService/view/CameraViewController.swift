@@ -10,13 +10,13 @@ import UIKit
 import AVKit
 import AVFoundation
 import SwiftyCam
-import MBProgressHUD
+//import MBProgressHUD
 import MediaPlayer
 import MobileCoreServices
-import Photos
+//import Photos
 import mobileffmpeg
 
-class CameraViewController: SwiftyCamViewController,  UIImagePickerControllerDelegate, UINavigationControllerDelegate, LogDelegate {
+class CameraViewController: SwiftyCamViewController {
 
     @IBOutlet weak var countdownLabel: UILabel!
     @IBOutlet weak var flashButton: UIButton!
@@ -37,14 +37,9 @@ class CameraViewController: SwiftyCamViewController,  UIImagePickerControllerDel
     
     var flashSound =  AVAudioPlayer()
     
-    var recordedVideoURLs: [URL] = []
+    var recordedVideoURLs: [[String]] = []
     let maxRecordedVideos = 5
     
-    var duration: Float = 0.0
-    
-    var progressingView: MBProgressHUD!
-    
-  
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
@@ -52,6 +47,13 @@ class CameraViewController: SwiftyCamViewController,  UIImagePickerControllerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let storedArray = UserDefaults.standard.array(forKey: "recordedVideos") as? [[String]] {
+//            print(storedArray)
+            self.recordedVideoURLs = storedArray
+        } else {
+            print("No data found for key 'recordedVideos'")
+        }
         
         cancelButton.isHidden = false
         datetimeLabel.isHidden = true
@@ -186,7 +188,8 @@ class CameraViewController: SwiftyCamViewController,  UIImagePickerControllerDel
     }
     
     @IBAction func selectVideoTapped(_ sender: Any) {
-        presentVideoPicker()
+//        presentVideoPicker()
+        self.performSegue(withIdentifier: "listview", sender: nil)
     }
     
     
@@ -240,271 +243,35 @@ class CameraViewController: SwiftyCamViewController,  UIImagePickerControllerDel
         }
     }
     
-    func presentVideoPicker() {
-        
-        guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
-            print("The photo library is not available.")
-            return
-        }
-
-        let videoPicker = UIImagePickerController()
-        videoPicker.delegate = self
-        videoPicker.sourceType = .photoLibrary
-        videoPicker.mediaTypes = [kUTTypeMovie as String] // Ensure import MobileCoreServices
-        videoPicker.allowsEditing = true // Optional: if you allow editing
-
-        // Customizing the navigation bar
-        videoPicker.navigationBar.barTintColor = UIColor.black // Bar background
-        videoPicker.navigationBar.tintColor = UIColor.white // Tint color for buttons
-        videoPicker.navigationBar.titleTextAttributes = [
-            NSAttributedString.Key.foregroundColor: UIColor.white
-        ] // Title color
-        
-        present(videoPicker, animated: true, completion: nil)
-    }
-    
-    func saveRecordedVideos() {
-        // Save recorded video URLs persistently
-        let savedVideoStrings = self.recordedVideoURLs.map { $0.absoluteString }
-        UserDefaults.standard.set(savedVideoStrings, forKey: "recordedVideos")
-        print("SAVED URLS: \(savedVideoStrings)")
-    }
-    
-    func logCallback(_ executionId: Int, _ level: Int32, _ message: String) {
-        
-        guard level == AV_LOG_INFO else { return }
-        
-        print("Compress status===>: \(message)")
-        
-        
-        if message.starts(with: "00:") {
-            self.duration = parseDuration(message) ?? 60.0
-        }
-        if let time = parseTime(message) {
-            let progress = Float(time / duration)
-            print("progress: \(progress)==== \(duration)/\(time)")
-            DispatchQueue.main.async {
-                self.progressingView.label.text = "Compressing... \(Int(progress * 100))%"
-//                self.progressBar.setProgress(progress, animated: true)
-            }
-            
-        }
-        
-    }
-
-    private func parseDuration(_ log: String) -> Float? {
-        let durationPattern = "(\\d{2}:\\d{2}:\\d{2}.\\d{2})"
-        return extractTime(from: log, with: durationPattern)
-    }
-
-    private func parseTime(_ log: String) -> Float? {
-        let timePattern = "time=(\\d{2}:\\d{2}:\\d{2}.\\d{2})"
-        return extractTime(from: log, with: timePattern)
-    }
-
-    private func extractTime(from log: String, with pattern: String) -> Float? {
-        let regex = try? NSRegularExpression(pattern: pattern, options: [])
-        let nsString = log as NSString
-        let results = regex?.matches(in: log, options: [], range: NSRange(location: 0, length: nsString.length))
-
-        guard let match = results?.first, let range = Range(match.range(at: 1), in: log) else {
-            return nil
-        }
-
-        let timeString = String(log[range])
-        return timeString.hhmmssToSeconds()
-    }
-    
     func dateString(date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "HH:mm:ss dd.MM.yyyy"
         return dateFormatter.string(from: date)
     }
     
-}
-
-extension CameraViewController {
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        picker.dismiss(animated: true)
-
-        if let videoURL = info[.mediaURL] as? URL {
-            print("Selected video URL: \(videoURL)")
-
-//            compressVideo(sourceURL: videoURL)                    // ios self compress
-//            compressVideowithFFmpeg(inputURL: videoURL)             // FFmpeg compress without progress
-            compressVideoWithProgress(inputURL: videoURL)           // Compress video with progress
-        } else {
-            print("video not found")
-            return
-        }
-    }
-
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true)
-    }
-    
-    func compressVideoWithProgress(inputURL: URL) {
-        hideButtons()
-        progressingView = MBProgressHUD.showAdded(to: view, animated: true)
-        progressingView.mode = .indeterminate
-        progressingView.label.text = "Compressing..."
+    func saveRecordedVideos(url: URL) {
+        let car_number = UserDefaults.standard.string(forKey: "CAR_NUMBER")
+        var videoData: [String] = []
+        videoData.append(url.absoluteString)
+        videoData.append(car_number!)
+        videoData.append(dateString(date: Date()))
         
-//        progressBar.isHidden = false
-
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let compressedURL = documentsDirectory.appendingPathComponent("\(UserDefaults.standard.string(forKey: "CAR_NUMBER") ?? datePresentString())_\(generateRandomString(length: 20)).mp4")
-
-        let command = "-i \(inputURL.path) -c:v h264 -r 30 -b:v 2800k -s 1280x720 -c:a aac -b:a 128k \(compressedURL.path)"
-
-        DispatchQueue.global(qos: .background).async {
-            MobileFFmpegConfig.setLogDelegate(self)
-//            let result = MobileFFmpeg.executeAsync(command, withCallback: self)
-            
-            let result = MobileFFmpeg.execute(command)
-            
-            DispatchQueue.main.async {
-                if result == RETURN_CODE_SUCCESS {
-                    
-                    self.handleCompressedVideo(compressedURL)
-                    
-                } else if result == RETURN_CODE_CANCEL {
-                    print("Video compressing was cancelled.")
-                } else {
-                    self.errorAlert(url: inputURL)
-                }
-            }
-            
-        }
-    }
-
-    func compressVideowithFFmpeg(inputURL: URL) {
-        progressingView = MBProgressHUD.showAdded(to: view, animated: true)
-        progressingView.mode = .indeterminate
-        progressingView.label.text = "Compressing..."
-        
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let compressedURL = documentsDirectory.appendingPathComponent("Video_\(datePresentString()).mp4")
-
-        let videoProcessor = Compress()
-
-        videoProcessor.compressVideo(inputVideoUrl: inputURL, outputVideoUrl: compressedURL) { [self] (status, compressedUrl, any) in
-            self.progressingView.hide(animated: true)
-            if status {
-                handleCompressedVideo(compressedUrl)
-                
-            } else {
-                self.errorAlert(url: inputURL)
-            }
-        }
-    }
-    
-    func compressVideo(sourceURL: URL) {   // photogallery self compressing
-        
-        progressingView = MBProgressHUD.showAdded(to: view, animated: true)
-        progressingView.mode = .indeterminate
-        progressingView.label.text = "Compressing..."
-        
-        let asset = AVAsset(url: sourceURL)
-        guard let exportSession = AVAssetExportSession(asset: asset, presetName: /*AVAssetExportPresetMediumQuality*/ AVAssetExportPreset1280x720) else {
-            print("Cannot create export session.")
-            return
-        }
-        
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let compressedURL = documentsDirectory.appendingPathComponent("Video_\(datePresentString()).mp4")
-        
-        // Delete existing file
-        try? FileManager.default.removeItem(at: compressedURL)
-        
-        exportSession.outputURL = compressedURL
-        exportSession.outputFileType = AVFileType.mp4
-        exportSession.metadata = asset.metadata
-//        exportSession.shouldOptimizeForNetworkUse = true
-        
-        exportSession.exportAsynchronously {
-            DispatchQueue.main.async {
-                self.progressingView.hide(animated: true)
-                switch exportSession.status {
-                    case .completed:
-                        print("Video compression successful.")
-                        self.handleCompressedVideo(compressedURL)
-                    case .failed:
-                        print("Video compression failed:", exportSession.error ?? "unknown error")
-                    default:
-                        break
-                }
-            }
-        }
-    }
-    
-    func handleCompressedVideo(_ url: URL) {
-        
-        print("Compressed video path: \(url.path)")
-        
-        UserDefaults.standard.set(dateString(date: Date()), forKey: "CREATED_TIME");
-        UserDefaults.standard.set(url, forKey: "VIDEO_URL")
-        
-        self.performSegue(withIdentifier: "upload", sender: nil)
-    }
-    
-    func handleLastvideos(_ url: URL) {
-        self.recordedVideoURLs.append(url)
+        self.recordedVideoURLs.append(videoData)
         
         // Ensure only the last 5 recorded videos are kept
         if self.recordedVideoURLs.count > self.maxRecordedVideos {
-            let removeURL = self.recordedVideoURLs.removeFirst()
-            try? FileManager.default.removeItem(at: removeURL)
+            let removeData = self.recordedVideoURLs.removeFirst()
+            try? FileManager.default.removeItem(at: URL(string: removeData[0])!)
         }
-        self.saveRecordedVideos()
-    }
-    
-    public func datePresentString() -> String {
-         let date = Date()
-         let dateFormatter = DateFormatter()
-         let enUSPosixLocale = Locale(identifier: "en_US_POSIX")
-         dateFormatter.calendar = Calendar(identifier: .iso8601)
-         dateFormatter.locale = enUSPosixLocale
-         dateFormatter.timeZone = TimeZone.current
-         dateFormatter.dateFormat = "yyyyMMdd_HHmmss"
-         
-         let iso8601String = dateFormatter.string(from: date as Date)
-         
-         return iso8601String
-     }
-    
-    
-    public func generateRandomString(length: Int) -> String {
-        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-          return String((0..<length).map{ _ in letters.randomElement()! })
-    }
-    
-    func errorAlert(url : URL) {
-        let message = NSLocalizedString("Something goes wrong during compress recorded video. Try Again?", comment: "")
-        let alertController = UIAlertController(title: "Compress Video", message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Yes", style: .default) { (action:UIAlertAction!) in
-            
-            self.compressVideo(sourceURL: url)
-        }
-
-        let cancelAction = UIAlertAction(title: "No", style: .cancel) { (action:UIAlertAction!) in
-            print("Cancel button tapped")
-        }
-        alertController.addAction(okAction)
-        alertController.addAction(cancelAction)
         
-        self.present(alertController, animated: true, completion: nil)
+        // Save recorded video URLs persistently
+        let savedVideoStrings = self.recordedVideoURLs.map { $0 as AnyObject }
+        UserDefaults.standard.set(savedVideoStrings, forKey: "recordedVideos")
+        
+        self.performSegue(withIdentifier: "listview", sender: nil)
     }
+    
 }
-
-extension UIImagePickerController {
-    open override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationBar.isHidden = true
-    }
-}
-
-
 
 extension CameraViewController: SwiftyCamViewControllerDelegate {
     
@@ -533,34 +300,7 @@ extension CameraViewController: SwiftyCamViewControllerDelegate {
     }
     
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didFinishProcessVideoAt url: URL) {
-        self.compressVideoWithProgress(inputURL: url)
-        
-        PHPhotoLibrary.requestAuthorization { status in
-            guard status == .authorized else {
-                print("Permission to access photo library denied.")
-                return
-            }
-            
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
-            }) { success, error in
-                if success {
-                    print("Video saved to photo library.")
-                    self.recordedVideoURLs.append(url)
-                    
-                    // Ensure only the last 5 recorded videos are kept
-                    if self.recordedVideoURLs.count > self.maxRecordedVideos {
-                        let removeURL = self.recordedVideoURLs.removeFirst()
-                        try? FileManager.default.removeItem(at: removeURL)
-                        self.removeVideoFromPhotoLibrary(videoURL: removeURL)
-                    }
-                    self.saveRecordedVideos()
-                    
-                } else if let error = error {
-                    print("Error saving video to photo library: \(error.localizedDescription)")
-                }
-            }
-        }
+        self.saveRecordedVideos(url: url)
         
     }
     
@@ -579,68 +319,7 @@ extension CameraViewController: SwiftyCamViewControllerDelegate {
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didFailToRecordVideo error: Error) {
         print(error)
     }
-    
-    func removeVideoFromPhotoLibrary(videoURL: URL) {
-        PHPhotoLibrary.shared().performChanges({
-            if let asset = PHAsset.fetchAssets(withALAssetURLs: [videoURL], options: nil).firstObject {
-                PHAssetChangeRequest.deleteAssets([asset] as NSArray)
-            }
-        }, completionHandler: { success, error in
-            if success {
-                print("Video removed successfully.")
-            } else {
-                print("Failed to remove video:", error?.localizedDescription ?? "Unknown error")
-            }
-        })
-    }
-
-    
 }
-
-//extension CameraViewController: LogDelegate {
-//    func logCallback(_ executionId: Int, _ level: Int32, _ message: String) {
-//        guard level == AV_LOG_INFO else { return }
-//
-//        print("Compress status===>: \(message)")
-//
-//
-//        if message.starts(with: "00:") {
-//            self.duration = parseDuration(message) ?? 60.0
-//        }
-//        if let time = parseTime(message) {
-//            let progress = Float(time / duration)
-//            print("progress: \(progress)==== \(duration)/\(time)")
-//            DispatchQueue.main.async {
-//                self.progressBar.setProgress(progress, animated: true)
-//            }
-//
-//        }
-//
-//    }
-//
-//    private func parseDuration(_ log: String) -> Float? {
-//        let durationPattern = "(\\d{2}:\\d{2}:\\d{2}.\\d{2})"
-//        return extractTime(from: log, with: durationPattern)
-//    }
-//
-//    private func parseTime(_ log: String) -> Float? {
-//        let timePattern = "time=(\\d{2}:\\d{2}:\\d{2}.\\d{2})"
-//        return extractTime(from: log, with: timePattern)
-//    }
-//
-//    private func extractTime(from log: String, with pattern: String) -> Float? {
-//        let regex = try? NSRegularExpression(pattern: pattern, options: [])
-//        let nsString = log as NSString
-//        let results = regex?.matches(in: log, options: [], range: NSRange(location: 0, length: nsString.length))
-//
-//        guard let match = results?.first, let range = Range(match.range(at: 1), in: log) else {
-//            return nil
-//        }
-//
-//        let timeString = String(log[range])
-//        return timeString.hhmmssToSeconds()
-//    }
-//}
 
 extension String {
     func hhmmssToSeconds() -> Float? {
