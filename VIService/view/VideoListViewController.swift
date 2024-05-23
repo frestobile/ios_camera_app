@@ -20,6 +20,7 @@ class VideoListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        UserDefaults.standard.set(false, forKey: "CAMERA_USED")
         videoTableView.dataSource = self
         videoTableView.delegate = self
         videoTableView.tableFooterView = UIView()
@@ -29,6 +30,7 @@ class VideoListViewController: UIViewController {
         
         companyLogo.loadImage(fromURL: imageURL)
         
+        cancelBtn.layer.cornerRadius = 5
         
         if let storedArray = UserDefaults.standard.array(forKey: "recordedVideos") as? [[String]] {
             self.videoArrayData = storedArray

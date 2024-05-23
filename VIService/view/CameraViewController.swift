@@ -25,7 +25,7 @@ class CameraViewController: SwiftyCamViewController {
     @IBOutlet weak var cancelButton: UIButton!
 
 
-    @IBOutlet weak var selectVideoBtn: UIButton!
+
     var isStarted: Bool = false
     var startedTime: Date = Date()
     var totalTime: Int = 0
@@ -47,13 +47,15 @@ class CameraViewController: SwiftyCamViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        cancelButton.layer.cornerRadius = 5
         if let storedArray = UserDefaults.standard.array(forKey: "recordedVideos") as? [[String]] {
 //            print(storedArray)
             self.recordedVideoURLs = storedArray
         } else {
             print("No data found for key 'recordedVideos'")
         }
+        
+        UserDefaults.standard.set(true, forKey: "CAMERA_USED")
         
         cancelButton.isHidden = false
         datetimeLabel.isHidden = true
@@ -165,7 +167,7 @@ class CameraViewController: SwiftyCamViewController {
         UIView.animate(withDuration: 0.25) {
             self.flashButton.alpha = 0.0
             self.cancelButton.alpha = 0.0
-            self.selectVideoBtn.alpha = 0.0
+//            self.selectVideoBtn.alpha = 0.0
         }
     }
     
@@ -173,7 +175,7 @@ class CameraViewController: SwiftyCamViewController {
         UIView.animate(withDuration: 0.25) {
             self.flashButton.alpha = 1.0
             self.cancelButton.alpha = 1.0
-            self.selectVideoBtn.alpha = 1.0
+//            self.selectVideoBtn.alpha = 1.0
         }
     }
     
@@ -185,11 +187,6 @@ class CameraViewController: SwiftyCamViewController {
                 
                 startVideoRecording()
             }
-    }
-    
-    @IBAction func selectVideoTapped(_ sender: Any) {
-//        presentVideoPicker()
-        self.performSegue(withIdentifier: "listview", sender: nil)
     }
     
     
@@ -250,6 +247,7 @@ class CameraViewController: SwiftyCamViewController {
     }
     
     func saveRecordedVideos(url: URL) {
+        UserDefaults.standard.set(url, forKey: "VIDEO_URL")
         let car_number = UserDefaults.standard.string(forKey: "CAR_NUMBER")
         var videoData: [String] = []
         videoData.append(url.absoluteString)
@@ -263,12 +261,13 @@ class CameraViewController: SwiftyCamViewController {
             let removeData = self.recordedVideoURLs.removeFirst()
             try? FileManager.default.removeItem(at: URL(string: removeData[0])!)
         }
+        let reversedArr = Array(self.recordedVideoURLs.reversed())
         
         // Save recorded video URLs persistently
-        let savedVideoStrings = self.recordedVideoURLs.map { $0 as AnyObject }
+        let savedVideoStrings = reversedArr.map { $0 as AnyObject }
         UserDefaults.standard.set(savedVideoStrings, forKey: "recordedVideos")
         
-        self.performSegue(withIdentifier: "listview", sender: nil)
+        self.performSegue(withIdentifier: "camera_upload", sender: nil)
     }
     
 }

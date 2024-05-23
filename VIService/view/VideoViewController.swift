@@ -15,17 +15,17 @@ class VideoViewController: UIViewController {
    fileprivate  var player = AVPlayer()
    fileprivate var playerController = AVPlayerViewController()
     
+    @IBOutlet weak var chooseButton: UIButton!
+    @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var controlView: UIView!
     @IBOutlet weak var videoView: UIView!
     var selectedVideo : [String] = []
     
     @IBOutlet weak var backgroundImg: UIImageView!
-    var isPlaying : Bool = false
-    
-    
-    var playImage : UIImage?
-    var pauseImage : UIImage?
+
+    var playerLayer: AVPlayerLayer!
+
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
@@ -41,12 +41,12 @@ class VideoViewController: UIViewController {
         } else {
             print("No data found for key 'selectedVideo'")
         }
-        
-//        playImage = UIImage(named: "play_blue")!
-//        pauseImage = UIImage(named: "pause_blue")!
-//        playButton.setBackgroundImage(playImage, for: .normal)
+        cancelButton.layer.cornerRadius = 5
+        chooseButton.layer.cornerRadius = 5
         playButton.setTitle("", for: .normal)
         backgroundImg.image = UIImage(named: "play_blue")
+        
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -54,21 +54,25 @@ class VideoViewController: UIViewController {
         if self.videoPath != nil {
             player = AVPlayer(url: self.videoPath!)
             player.rate = 1
-            let playerController = AVPlayerViewController()
-            playerController.player = player
-            playerController.videoGravity = .resizeAspect
-            player.isMuted = false
-            self.addChild(playerController)
-            _ = AVAsset(url: self.videoPath!)
-            self.videoView.addSubview(playerController.view)
+//            let playerController = AVPlayerViewController()
+//            playerController.player = player
+//            playerController.videoGravity = .resizeAspect
+//            player.isMuted = false
+//            self.addChild(playerController)
+//            _ = AVAsset(url: self.videoPath!)
+//            self.videoView.addSubview(playerController.view)
+            playerLayer = AVPlayerLayer(player: player)
+            playerLayer.frame = videoView.bounds
+            playerLayer.videoGravity = .resizeAspect
+            self.videoView.layer.addSublayer(playerLayer)
             
             player.pause()
             
-            UIView.animate(withDuration: 0.3, animations: {
-                self.controlView.alpha = 1.0
-            }) { (finished) in
-                self.controlView.isHidden = false
-            }
+//            UIView.animate(withDuration: 0.3, animations: {
+//                self.controlView.alpha = 1.0
+//            }) { (finished) in
+//                self.controlView.isHidden = false
+//            }
            
         }
     }
@@ -76,9 +80,6 @@ class VideoViewController: UIViewController {
     @IBAction func cancelButtonTapped(_ sender: Any) {
         player.pause()
         UserDefaults.standard.removeObject(forKey: "selectedVideo")
-//        if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "camera") {
-//            self.navigationController?.setViewControllers([viewController], animated: true)
-//        }
         _ = navigationController?.popViewController(animated: true)
     }
     
@@ -89,15 +90,13 @@ class VideoViewController: UIViewController {
     }
     
     @IBAction func playButtonTapped(_ sender: Any) {
-        if isPlaying {
-            backgroundImg.image = UIImage(named: "play_blue")
+        
+        if player.timeControlStatus == .playing {
             player.pause()
-            self.isPlaying = false
-
+            backgroundImg.image = UIImage(named: "play_blue")
         } else {
-            backgroundImg.image = UIImage(named: "pause_blue")
             player.play()
-            self.isPlaying = true	
+            backgroundImg.image = UIImage(named: "pause_blue")
         }
         
     }

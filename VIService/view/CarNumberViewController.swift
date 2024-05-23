@@ -17,6 +17,7 @@ class CarNumberViewController: UIViewController {
     @IBOutlet weak var carNumberTextField: SkyFloatingLabelTextField!
     @IBOutlet weak var technicianTextField: SkyFloatingLabelTextField!
     
+    @IBOutlet weak var listButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var logoutButton: UIButton!
     
@@ -38,8 +39,9 @@ class CarNumberViewController: UIViewController {
     // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        nextButton.layer.cornerRadius = 1
-        logoutButton.layer.cornerRadius = 1
+        nextButton.layer.cornerRadius = 5
+        logoutButton.layer.cornerRadius = 5
+        listButton.layer.cornerRadius = 5
 
     }
     
@@ -57,6 +59,9 @@ class CarNumberViewController: UIViewController {
         performSegue(withIdentifier: "login", sender: nil)
     }
     
+    @IBAction func listButtonPressed(_ sender: Any) {
+        self.performSegue(withIdentifier: "list", sender: nil)
+    }
     @IBAction func nextButtonPressed(_ sender: Any) {
         let deviceId = UserDefaults.standard.string(forKey: "DEVICE_ID") ?? ""
         let carNumber = carNumberTextField.text ?? ""

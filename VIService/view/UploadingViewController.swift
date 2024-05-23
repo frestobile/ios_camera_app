@@ -22,6 +22,7 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     @IBOutlet weak var companyLogo: UIImageView!
     @IBOutlet weak var dateTextField: SkyFloatingLabelTextField!
+    
     var deviceId : String = ""
     var carNumber : String = ""
     var technician : String = ""
@@ -31,6 +32,8 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     var progressingView: MBProgressHUD!
     var duration: Float = 0.0
+    
+    var isCameraUsed: Bool = false
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
@@ -46,28 +49,32 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        carNumberTextField.text = UserDefaults.standard.string(forKey: "CAR_NUMBER") ?? ""
-        technicianTextField.text = UserDefaults.standard.string(forKey: "TECHNICIAN") ?? ""
-       
-        uploadButton.layer.cornerRadius = 1
-        deleteButton.layer.cornerRadius = 1
         
         deviceId = UserDefaults.standard.string(forKey: "DEVICE_ID") ?? ""
-        carNumber = carNumberTextField.text ?? ""
-        technician = technicianTextField.text ?? ""
-//        videoUrl = UserDefaults.standard.url(forKey: "VIDEO_URL")!
-    
-        if let storedArray = UserDefaults.standard.array(forKey: "selectedVideo") as? [String] {
-            self.videoData = storedArray
-            self.videoUrl = URL(string: self.videoData[0])
-            self.dateTextField.text = self.videoData[2]
+        isCameraUsed = UserDefaults.standard.bool(forKey: "CAMERA_USED")
+        
+        if isCameraUsed {
+            carNumberTextField.text = UserDefaults.standard.string(forKey: "CAR_NUMBER") ?? ""
+            technicianTextField.text = UserDefaults.standard.string(forKey: "TECHNICIAN") ?? ""
+            videoUrl = UserDefaults.standard.url(forKey: "VIDEO_URL")
         } else {
-            print("No data found for key 'selectedVideo'")
+            if let storedArray = UserDefaults.standard.array(forKey: "selectedVideo") as? [String] {
+                self.videoData = storedArray
+                self.videoUrl = URL(string: self.videoData[0])
+                self.dateTextField.text = self.videoData[2]
+                self.carNumberTextField.text = self.videoData[1]
+            } else {
+                print("No data found for key 'selectedVideo'")
+            }
         }
         
-        print("URL:==> \(videoData[0])")
-        print("Car Number:==> \(videoData[1]) ====\(carNumber)")
-        print("Date :==> \(videoData[2])")
+       
+        uploadButton.layer.cornerRadius = 5
+        deleteButton.layer.cornerRadius = 5
+        
+        carNumber = carNumberTextField.text ?? ""
+        technician = technicianTextField.text ?? ""
+
     }
     
     
@@ -91,9 +98,11 @@ class UploadingViewController: UIViewController, LogDelegate {
             
         })
         alert.addAction(UIAlertAction(title: "OK", style: .default) { (alertAction) in
-            
 //            self.deleteFile(url: self.videoUrl!)
-            self.deleteFile(url: self.compressedUrl!)
+            if self.compressedUrl != nil {
+                self.deleteFile(url: self.compressedUrl!)
+            }
+            
             UserDefaults.standard.removeObject(forKey: "selectedVideo")
             
             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
@@ -131,19 +140,17 @@ class UploadingViewController: UIViewController, LogDelegate {
                 }
             }
         } else {
-            if self.carNumber != self.videoData[1] {
-                showAlert(title: "VIServ ERROR", message: "Selected Video's Car number is not same with current Car number.") {
-//                    self.deleteFile(url: self.videoUrl!)
-//                    self.deleteFile(url: self.compressedUrl!)
-                    UserDefaults.standard.removeObject(forKey: "selectedVideo")
-                    UserDefaults.standard.removeObject(forKey: "CAR_NUMBER")
-                    if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
-                        self.navigationController?.setViewControllers([viewController], animated: true)
-                    }
-                }
-            } else {
+//            if self.carNumber != self.videoData[1] {
+//                showAlert(title: "Error", message: "Selected Video's Car number is not same with current Car number.") {
+//                    UserDefaults.standard.removeObject(forKey: "selectedVideo")
+//                    UserDefaults.standard.removeObject(forKey: "CAR_NUMBER")
+//                    if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
+//                        self.navigationController?.setViewControllers([viewController], animated: true)
+//                    }
+//                }
+//            } else {
                 self.compressVideoWithProgress(inputURL: self.videoUrl!)
-            }
+//            }
         }
     }
     
@@ -166,9 +173,9 @@ class UploadingViewController: UIViewController, LogDelegate {
             case .success(let response):
                 if response.error {
                     self.uploadButton.setTitle("Resend video", for: .normal)
-                    self.showAlert(title: "VIServ Error", message: "Upload Failed, Try again later.")
+                    self.showAlert(title: "Error", message: "Upload Failed, Try again later.")
                 } else {
-                    self.showAlert(title: "VIServ", message: "Video upload done") {
+                    self.showAlert(title: "", message: "Video upload done") {
 //                        self.deleteFile(url: self.videoUrl!)
                         self.deleteFile(url: self.compressedUrl!)
                         UserDefaults.standard.removeObject(forKey: "selectedVideo")
