@@ -2,7 +2,7 @@
 //  VideoListViewController.swift
 //  VIService
 //
-//  Created by Leoard on 5/13/24.
+//  Created by Frestobile on 5/13/24.
 //  Copyright © 2024 Polestar. All rights reserved.
 //
 import AVFoundation
@@ -18,8 +18,14 @@ class VideoListViewController: UIViewController {
     @IBOutlet weak var cancelBtn: UIButton!
     var videoArrayData: [[String]] = []
     
+    var inactivityTimer: Timer?
+    var originalBrightness: CGFloat = UIScreen.main.brightness
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+//        startInactivityTimer()
+        
         UserDefaults.standard.set(false, forKey: "CAMERA_USED")
         videoTableView.dataSource = self
         videoTableView.delegate = self
@@ -126,7 +132,7 @@ extension VideoListViewController: UITableViewDelegate, UITableViewDataSource {
     func generateThumbnail(from videoURL: URL, size: CGSize, completion: @escaping (UIImage?) -> Void) {
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
-        
+        imageGenerator.appliesPreferredTrackTransform = true
         imageGenerator.maximumSize = size
         
         let time = CMTimeMake(value: 1, timescale: 60) // 1 second
@@ -135,7 +141,7 @@ extension VideoListViewController: UITableViewDelegate, UITableViewDataSource {
         do {
             let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
             let thumbnail = UIImage(cgImage: cgImage)
-            completion(thumbnail)
+            completion(fixOrientation(of: thumbnail))
         } catch {
             print("Error generating thumbnail: \(error.localizedDescription)")
             completion(nil)
@@ -151,5 +157,73 @@ extension VideoListViewController: UITableViewDelegate, UITableViewDataSource {
             completion(false)
         })
         present(alert, animated: true, completion: nil)
+    }
+    
+    func fixOrientation(of image: UIImage) -> UIImage {
+        guard image.imageOrientation != .up else {
+            // No need to adjust orientation
+            return image
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+        image.draw(in: CGRect(origin: .zero, size: image.size))
+        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return normalizedImage ?? image
+    }
+}
+
+extension VideoListViewController {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+        
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    private func startInactivityTimer() {
+        //        stopInactivityTimer()
+        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        //        print("Screen brightness restored to \(originalBrightness)")
+    }
+    
+    private func stopInactivityTimer() {
+        //        inactivityTimer?.invalidate()
+        //        inactivityTimer = nil
+    }
+    
+    private func resetInactivityTimer() {
+        stopInactivityTimer()
+        startInactivityTimer()
+    }
+    
+    @objc private func dimScreen() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.1
+        print("Screen dimmed to 0.1")
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+        print("Screen brightness restored to \(originalBrightness)")
     }
 }

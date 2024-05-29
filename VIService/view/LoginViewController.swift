@@ -2,7 +2,7 @@
 //  LoginViewController.swift
 //  VIService
 //
-//  Created by HONGYUN on 10/12/19.
+//  Created by Frestobile on 10/12/19.
 //  Copyright © 2020 Star. All rights reserved.
 //
 
@@ -19,6 +19,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var passwordField: SkyFloatingLabelTextField!
     @IBOutlet weak var btnLogin: UIButton!
     
+    var inactivityTimer: Timer?
+    var originalBrightness: CGFloat = UIScreen.main.brightness
+    
 //    var connected :Int = 0
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
@@ -26,10 +29,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        startInactivityTimer()
         btnLogin.layer.cornerRadius = 5
-//        NetworkManager.shared.delegate = self
-//
-//        NetworkManager.shared.getRequest()
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
         tap.delegate = self // This is not required
         self.view.addGestureRecognizer(tap)
@@ -78,30 +80,6 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
                 print("Camera access denied")
             }
         }
-        
-//        if #available(iOS 14, *) {
-//            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-//                switch status {
-//                    case .authorized:
-//                        // Permission granted, you can access the photo library
-//                        print("Photo library access granted")
-//                    case .denied, .restricted:
-//                        // Permission denied, handle accordingly
-//                        print("Photo library access denied")
-//                    case .notDetermined:
-//                        // The user has not yet made a choice
-//                        print("Photo library access not determined")
-//                    case .limited:
-//                        print("Photo library access limited")
-//                    @unknown default:
-//                            fatalError()
-//                }
-//            }
-//        } else {
-//            // Fallback on earlier versions
-//        }
-        
-
     }
     
     func showAlert(title: String, message: String, handler: (() -> Void)? = nil) {
@@ -151,6 +129,60 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
                 self.showAlert(title: "Error", message: error.localizedDescription)
             }
         }
+    }
+}
+
+extension LoginViewController {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+//        resetInactivityTimer()
+//        restoreBrightness()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+//        resetInactivityTimer()
+//        restoreBrightness()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+//        resetInactivityTimer()
+//        restoreBrightness()
+       
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+//        resetInactivityTimer()
+//        restoreBrightness()
+    }
+    
+    private func startInactivityTimer() {
+//        stopInactivityTimer()
+//        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+//        print("Screen brightness restored to \(originalBrightness)")
+    }
+    
+    private func stopInactivityTimer() {
+//        inactivityTimer?.invalidate()
+//        inactivityTimer = nil
+    }
+    
+    private func resetInactivityTimer() {
+        stopInactivityTimer()
+        startInactivityTimer()
+    }
+    
+    @objc private func dimScreen() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.1
+        print("Screen dimmed to 0.1")
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+        print("Screen brightness restored to \(originalBrightness)")
     }
 }
 

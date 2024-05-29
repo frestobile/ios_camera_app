@@ -2,7 +2,7 @@
 //  CarNumberViewController.swift
 //  VIService
 //
-//  Created by HONGYUN on 2/26/20.
+//  Created by Frestobile on 2/26/20.
 //  Copyright © 2020 Star. All rights reserved.
 //
 
@@ -22,6 +22,9 @@ class CarNumberViewController: UIViewController {
     @IBOutlet weak var logoutButton: UIButton!
     
     @IBOutlet weak var companyLogo: UIImageView!
+    
+    var inactivityTimer: Timer?
+    var originalBrightness: CGFloat = UIScreen.main.brightness
 
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -39,6 +42,8 @@ class CarNumberViewController: UIViewController {
     // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
+//        startInactivityTimer()
+        
         nextButton.layer.cornerRadius = 5
         logoutButton.layer.cornerRadius = 5
         listButton.layer.cornerRadius = 5
@@ -139,4 +144,58 @@ extension MPVolumeView {
         }
     }
     
+}
+
+extension CarNumberViewController {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+        
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    private func startInactivityTimer() {
+        //        stopInactivityTimer()
+        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        //        print("Screen brightness restored to \(originalBrightness)")
+    }
+    
+    private func stopInactivityTimer() {
+        //        inactivityTimer?.invalidate()
+        //        inactivityTimer = nil
+    }
+    
+    private func resetInactivityTimer() {
+        stopInactivityTimer()
+        startInactivityTimer()
+    }
+    
+    @objc private func dimScreen() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.1
+        print("Screen dimmed to 0.1")
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+        print("Screen brightness restored to \(originalBrightness)")
+    }
 }

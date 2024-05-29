@@ -2,7 +2,7 @@
 //  VideoCell.swift
 //  VIService
 //
-//  Created by Leoard on 5/13/24.
+//  Created by Frestobile on 5/13/24.
 //  Copyright © 2024 Polestar. All rights reserved.
 //
 

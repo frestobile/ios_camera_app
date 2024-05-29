@@ -2,7 +2,7 @@
 //  UploadingViewController.swift
 //  VIService
 //
-//  Created by HONGYUN on 2/26/20.
+//  Created by Fresobile on 2/26/20.
 //  Copyright © 2020 Star. All rights reserved.
 //
 
@@ -22,6 +22,9 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     @IBOutlet weak var companyLogo: UIImageView!
     @IBOutlet weak var dateTextField: SkyFloatingLabelTextField!
+    
+    var inactivityTimer: Timer?
+    var originalBrightness: CGFloat = UIScreen.main.brightness
     
     var deviceId : String = ""
     var carNumber : String = ""
@@ -49,6 +52,7 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        startInactivityTimer()
         
         deviceId = UserDefaults.standard.string(forKey: "DEVICE_ID") ?? ""
         isCameraUsed = UserDefaults.standard.bool(forKey: "CAMERA_USED")
@@ -93,11 +97,11 @@ class UploadingViewController: UIViewController, LogDelegate {
     }
     
     @IBAction func deleteButtonPressed(_ sender: Any) {
-        let alert = UIAlertController.init(title: "Delete video", message: "Are you sure to delete video?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { (alertAction) in
+        let alert = UIAlertController.init(title: "", message: "Do you want to cancel uploading?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "No", style: .cancel) { (alertAction) in
             
         })
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { (alertAction) in
+        alert.addAction(UIAlertAction(title: "Yes", style: .default) { (alertAction) in
 //            self.deleteFile(url: self.videoUrl!)
             if self.compressedUrl != nil {
                 self.deleteFile(url: self.compressedUrl!)
@@ -140,17 +144,33 @@ class UploadingViewController: UIViewController, LogDelegate {
                 }
             }
         } else {
-//            if self.carNumber != self.videoData[1] {
-//                showAlert(title: "Error", message: "Selected Video's Car number is not same with current Car number.") {
-//                    UserDefaults.standard.removeObject(forKey: "selectedVideo")
-//                    UserDefaults.standard.removeObject(forKey: "CAR_NUMBER")
-//                    if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
-//                        self.navigationController?.setViewControllers([viewController], animated: true)
-//                    }
-//                }
-//            } else {
+            if !isCameraUsed {
+                MBProgressHUD.showAdded(to: view, animated: true)
+                
+                ApiManager.shared.videoCheck(deviceId: deviceId, carNumber: carNumber) { (result) in
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                    switch result {
+                        case .success(let response):
+                            if response.error {
+                                self.showAlert(title: "Error", message: response.msg) {
+                                    if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
+                                        self.navigationController?.setViewControllers([viewController], animated: true)
+                                    }
+                                }
+                            } else {
+                                self.compressVideoWithProgress(inputURL: self.videoUrl!)
+                            }
+                        case .failure(let error):
+                            self.showAlert(title: "Error", message: error.localizedDescription) {
+                                if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
+                                    self.navigationController?.setViewControllers([viewController], animated: true)
+                                }
+                            }
+                    }
+                }
+            } else {
                 self.compressVideoWithProgress(inputURL: self.videoUrl!)
-//            }
+            }
         }
     }
     
@@ -320,5 +340,60 @@ extension UploadingViewController {
         alertController.addAction(cancelAction)
         
         self.present(alertController, animated: true, completion: nil)
+    }
+}
+
+
+extension UploadingViewController {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+        
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    private func startInactivityTimer() {
+        //        stopInactivityTimer()
+        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        //        print("Screen brightness restored to \(originalBrightness)")
+    }
+    
+    private func stopInactivityTimer() {
+        //        inactivityTimer?.invalidate()
+        //        inactivityTimer = nil
+    }
+    
+    private func resetInactivityTimer() {
+        stopInactivityTimer()
+        startInactivityTimer()
+    }
+    
+    @objc private func dimScreen() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.1
+        print("Screen dimmed to 0.1")
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+        print("Screen brightness restored to \(originalBrightness)")
     }
 }

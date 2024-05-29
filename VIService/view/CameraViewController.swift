@@ -2,7 +2,7 @@
 //  CameraViewController.swift
 //  VIService
 //
-//  Created by HONGYUN on 16/06/17.
+//  Created by Frestobile on 16/06/21.
 //  Copyright © 2020 Star. All rights reserved.
 //
 
@@ -24,7 +24,8 @@ class CameraViewController: SwiftyCamViewController {
     @IBOutlet weak var recordButton: KYShutterButton!
     @IBOutlet weak var cancelButton: UIButton!
 
-
+    var inactivityTimer: Timer?
+    var originalBrightness: CGFloat = UIScreen.main.brightness
 
     var isStarted: Bool = false
     var startedTime: Date = Date()
@@ -47,6 +48,8 @@ class CameraViewController: SwiftyCamViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        startInactivityTimer()
+        
         cancelButton.layer.cornerRadius = 5
         if let storedArray = UserDefaults.standard.array(forKey: "recordedVideos") as? [[String]] {
 //            print(storedArray)
@@ -330,6 +333,60 @@ extension String {
         return hours * 3600 + minutes * 60 + seconds
     }
     
+}
+
+extension CameraViewController {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+        
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        //        resetInactivityTimer()
+        //        restoreBrightness()
+    }
+    
+    private func startInactivityTimer() {
+        //        stopInactivityTimer()
+        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        //        print("Screen brightness restored to \(originalBrightness)")
+    }
+    
+    private func stopInactivityTimer() {
+        //        inactivityTimer?.invalidate()
+        //        inactivityTimer = nil
+    }
+    
+    private func resetInactivityTimer() {
+        stopInactivityTimer()
+        startInactivityTimer()
+    }
+    
+    @objc private func dimScreen() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.1
+        print("Screen dimmed to 0.1")
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+        print("Screen brightness restored to \(originalBrightness)")
+    }
 }
 
 
