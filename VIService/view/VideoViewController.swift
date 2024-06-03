@@ -29,14 +29,13 @@ class VideoViewController: UIViewController {
     var inactivityTimer: Timer?
     var originalBrightness: CGFloat = UIScreen.main.brightness
 
-
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        startInactivityTimer()
+        startInactivityTimer()
         
         if let storedArray = UserDefaults.standard.array(forKey: "selectedVideo") as? [String] {
             self.selectedVideo = storedArray
@@ -109,38 +108,38 @@ class VideoViewController: UIViewController {
 extension VideoViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
         
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
     }
     
     private func startInactivityTimer() {
-        //        stopInactivityTimer()
-        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        //        print("Screen brightness restored to \(originalBrightness)")
+        stopInactivityTimer()
+        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        
     }
     
     private func stopInactivityTimer() {
-        //        inactivityTimer?.invalidate()
-        //        inactivityTimer = nil
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
     }
     
     private func resetInactivityTimer() {

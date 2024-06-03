@@ -48,7 +48,7 @@ class CameraViewController: SwiftyCamViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        startInactivityTimer()
+        startInactivityTimer()
         
         cancelButton.layer.cornerRadius = 5
         if let storedArray = UserDefaults.standard.array(forKey: "recordedVideos") as? [[String]] {
@@ -251,6 +251,7 @@ class CameraViewController: SwiftyCamViewController {
     
     func saveRecordedVideos(url: URL) {
         UserDefaults.standard.set(url, forKey: "VIDEO_URL")
+        UserDefaults.standard.set(dateString(date: Date()), forKey: "CREATED_TIME")
         let car_number = UserDefaults.standard.string(forKey: "CAR_NUMBER")
         var videoData: [String] = []
         videoData.append(url.absoluteString)
@@ -338,38 +339,38 @@ extension String {
 extension CameraViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
         
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+        resetInactivityTimer()
+                restoreBrightness()
     }
     
     private func startInactivityTimer() {
-        //        stopInactivityTimer()
-        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        //        print("Screen brightness restored to \(originalBrightness)")
+        stopInactivityTimer()
+        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        
     }
     
     private func stopInactivityTimer() {
-        //        inactivityTimer?.invalidate()
-        //        inactivityTimer = nil
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
     }
     
     private func resetInactivityTimer() {

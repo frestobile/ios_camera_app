@@ -52,7 +52,7 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        startInactivityTimer()
+        startInactivityTimer()
         
         deviceId = UserDefaults.standard.string(forKey: "DEVICE_ID") ?? ""
         isCameraUsed = UserDefaults.standard.bool(forKey: "CAMERA_USED")
@@ -60,6 +60,7 @@ class UploadingViewController: UIViewController, LogDelegate {
         if isCameraUsed {
             carNumberTextField.text = UserDefaults.standard.string(forKey: "CAR_NUMBER") ?? ""
             technicianTextField.text = UserDefaults.standard.string(forKey: "TECHNICIAN") ?? ""
+            self.dateTextField.text = UserDefaults.standard.string(forKey: "CREATED_TIME") ?? ""
             videoUrl = UserDefaults.standard.url(forKey: "VIDEO_URL")
         } else {
             if let storedArray = UserDefaults.standard.array(forKey: "selectedVideo") as? [String] {
@@ -347,38 +348,38 @@ extension UploadingViewController {
 extension UploadingViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+                resetInactivityTimer()
+                restoreBrightness()
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+                resetInactivityTimer()
+                restoreBrightness()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+                resetInactivityTimer()
+                restoreBrightness()
         
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        //        resetInactivityTimer()
-        //        restoreBrightness()
+                resetInactivityTimer()
+                restoreBrightness()
     }
     
     private func startInactivityTimer() {
-        //        stopInactivityTimer()
-        //        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        //        print("Screen brightness restored to \(originalBrightness)")
+                stopInactivityTimer()
+                inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+
     }
     
     private func stopInactivityTimer() {
-        //        inactivityTimer?.invalidate()
-        //        inactivityTimer = nil
+                inactivityTimer?.invalidate()
+                inactivityTimer = nil
     }
     
     private func resetInactivityTimer() {
