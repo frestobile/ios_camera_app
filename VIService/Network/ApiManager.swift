@@ -2,7 +2,7 @@
 //  ApiManager.swift
 //  VIService
 //
-//  Created by HONGYUN on 2/26/20.
+//  Created by Frestobile on 2/26/20.
 //  Copyright © 2020 Star. All rights reserved.
 //
 
@@ -129,7 +129,6 @@ class ApiManager {
                 case .failure(let error):
                     completion(.failure(error))
             }
-            print("API result:  \(result)")
         }
 
     }

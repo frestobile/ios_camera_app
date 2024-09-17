@@ -2,7 +2,7 @@
 //  CarNumberViewController.swift
 //  VIService
 //
-//  Created by HONGYUN on 2/26/20.
+//  Created by Frestobile on 2/26/20.
 //  Copyright © 2020 Star. All rights reserved.
 //
 
@@ -17,10 +17,14 @@ class CarNumberViewController: UIViewController {
     @IBOutlet weak var carNumberTextField: SkyFloatingLabelTextField!
     @IBOutlet weak var technicianTextField: SkyFloatingLabelTextField!
     
+    @IBOutlet weak var listButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var logoutButton: UIButton!
     
     @IBOutlet weak var companyLogo: UIImageView!
+    
+    var inactivityTimer: Timer?
+    var originalBrightness: CGFloat = UIScreen.main.brightness
 
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -35,11 +39,14 @@ class CarNumberViewController: UIViewController {
         companyLogo.loadImage(fromURL: imageURL)
     }
     
-    
+    // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        nextButton.layer.cornerRadius = 1
-        logoutButton.layer.cornerRadius = 1
+        startInactivityTimer()
+        
+        nextButton.layer.cornerRadius = 5
+        logoutButton.layer.cornerRadius = 5
+        listButton.layer.cornerRadius = 5
 
     }
     
@@ -57,6 +64,9 @@ class CarNumberViewController: UIViewController {
         performSegue(withIdentifier: "login", sender: nil)
     }
     
+    @IBAction func listButtonPressed(_ sender: Any) {
+        self.performSegue(withIdentifier: "list", sender: nil)
+    }
     @IBAction func nextButtonPressed(_ sender: Any) {
         let deviceId = UserDefaults.standard.string(forKey: "DEVICE_ID") ?? ""
         let carNumber = carNumberTextField.text ?? ""
@@ -98,7 +108,6 @@ class CarNumberViewController: UIViewController {
             }
         }
     }
-    
 }
 
 extension UIImageView {
@@ -134,4 +143,58 @@ extension MPVolumeView {
         }
     }
     
+}
+
+extension CarNumberViewController {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        resetInactivityTimer()
+                restoreBrightness()
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        resetInactivityTimer()
+                restoreBrightness()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        resetInactivityTimer()
+                restoreBrightness()
+        
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        resetInactivityTimer()
+                restoreBrightness()
+    }
+    
+    private func startInactivityTimer() {
+        stopInactivityTimer()
+        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
+        
+    }
+    
+    private func stopInactivityTimer() {
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
+    }
+    
+    private func resetInactivityTimer() {
+        stopInactivityTimer()
+        startInactivityTimer()
+    }
+    
+    @objc private func dimScreen() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.1
+        print("Screen dimmed to 0.1")
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+        print("Screen brightness restored to \(originalBrightness)")
+    }
 }
