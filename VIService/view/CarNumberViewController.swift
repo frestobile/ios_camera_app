@@ -17,15 +17,28 @@ class CarNumberViewController: UIViewController {
     @IBOutlet weak var carNumberTextField: SkyFloatingLabelTextField!
     @IBOutlet weak var technicianTextField: SkyFloatingLabelTextField!
     
+    @IBOutlet weak var langSelectButton: UIButton!
     @IBOutlet weak var listButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var logoutButton: UIButton!
     
+    
     @IBOutlet weak var companyLogo: UIImageView!
     
-    var inactivityTimer: Timer?
-    var originalBrightness: CGFloat = UIScreen.main.brightness
-
+    var languageData: [Language] = []
+    var filteredLang: [Language] = []
+    
+    var languageView = UIView()
+    var showLangView: Bool = false
+    
+    let languages = [
+        Language(id: "0", name: "English", code: "en", status: "1"),
+        Language(id: "1", name: "Spanish", code: "es", status: "1"),
+        Language(id: "2", name: "Finnish", code: "fi", status: "1"),
+        Language(id: "3", name: "Estonian", code: "et", status: "1"),
+        Language(id: "4", name: "German", code: "de", status: "1"),
+        Language(id: "5", name: "Swedish", code: "sv", status: "1")
+    ]
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
@@ -34,7 +47,8 @@ class CarNumberViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let logoUrl = UserDefaults.standard.string(forKey: "COMPANY_LOGO")!
-        let imageURL = URL(string: ASSETS_URL + logoUrl)!
+        let assetUrl = UserDefaults.standard.string(forKey: "ASSET_URL") ?? ASSETS_URL
+        let imageURL = URL(string: assetUrl + logoUrl)!
         
         companyLogo.loadImage(fromURL: imageURL)
     }
@@ -42,12 +56,50 @@ class CarNumberViewController: UIViewController {
     // MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        startInactivityTimer()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .languageDidChange, object: nil)
         
         nextButton.layer.cornerRadius = 5
         logoutButton.layer.cornerRadius = 5
         listButton.layer.cornerRadius = 5
+        languageView.isHidden = true
+        
+        updateUI()
 
+    }
+    
+    @objc func updateUI() {
+        if let langArray = getLangFromUserDefaults() {
+            languageData = langArray
+        } else {
+            languageData = languages
+        }
+        let selectedLanguageCode = LanguageManager.shared.getCurrentLanguage()
+        let flagImage = UIImage(named: selectedLanguageCode)
+        langSelectButton.setImage(flagImage, for: .normal)
+        langSelectButton.layer.borderWidth = 1
+        langSelectButton.layer.borderColor = UIColor.black.cgColor
+        nextButton.setTitle(LanguageManager.shared.localizedString(for: "next"), for: .normal)
+        listButton.setTitle(LanguageManager.shared.localizedString(for: "list"), for: .normal)
+        logoutButton.setTitle(LanguageManager.shared.localizedString(for: "logout"), for: .normal)
+        langSelectButton.setTitle("", for: .normal)
+        carNumberTextField.placeholder = LanguageManager.shared.localizedString(for: "car_number")
+        technicianTextField.placeholder = LanguageManager.shared.localizedString(for: "tech")
+        createLanguageSelectionView()
+    }
+    
+    func getLangFromUserDefaults() -> [Language]? {
+        guard let savedData = UserDefaults.standard.data(forKey: "LANGUAGES") else {
+            print("No lang data found in UserDefaults.")
+            return nil
+        }
+        do {
+            let decodedLang = try JSONDecoder().decode([Language].self, from: savedData)
+            return decodedLang
+        } catch {
+            print("Error decoding lang data from UserDefaults: \(error)")
+            return nil
+        }
     }
     
     func showAlert(title: String, message: String, handler: (() -> Void)? = nil) {
@@ -59,6 +111,11 @@ class CarNumberViewController: UIViewController {
     }
 
     @IBAction func logoutButtonPressed(_ sender: Any) {
+        LanguageManager.shared.setLanguage("en")
+        NotificationCenter.default.post(name: .languageDidChange, object: nil)
+        UserDefaults.standard.removeObject(forKey: "LANGUAGES")
+        UserDefaults.standard.removeObject(forKey: "SERVER_URL")
+        UserDefaults.standard.removeObject(forKey: "ASSET_URL")
         UserDefaults.standard.removeObject(forKey: "COMPANY_LOGO")
         UserDefaults.standard.removeObject(forKey: "DEVICE_ID")
         performSegue(withIdentifier: "login", sender: nil)
@@ -73,7 +130,7 @@ class CarNumberViewController: UIViewController {
         let technician = technicianTextField.text ?? ""
         
         if carNumber.isEmpty {
-            showAlert(title: "Error", message: "Please enter car number.")
+            showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: LanguageManager.shared.localizedString(for: "car_number_empty"))
             return
         }
 //        else if technician.isEmpty {
@@ -92,7 +149,7 @@ class CarNumberViewController: UIViewController {
             switch result {
             case .success(let response):
                 if response.error {
-                    self.showAlert(title: "Error", message: response.msg)
+                    self.showAlert(title: NSLocalizedString("error", comment: ""), message: response.msg)
                 } else {
                     UserDefaults.standard.set(carNumber, forKey: "CAR_NUMBER")
                     if technician.isEmpty {
@@ -104,9 +161,87 @@ class CarNumberViewController: UIViewController {
                     self.performSegue(withIdentifier: "recording", sender: nil)
                 }
             case .failure(let error):
-                self.showAlert(title: "Error", message: error.localizedDescription)
+                self.showAlert(title: NSLocalizedString("error", comment: ""), message: error.localizedDescription)
             }
         }
+    }
+    @IBAction func langSelectBtnClicked(_ sender: Any) {
+        if showLangView {
+            languageView.isHidden = true
+            showLangView = false
+        } else {
+            languageView.isHidden = false
+            showLangView = true
+        }
+        
+
+    }
+    
+    func createLanguageSelectionView() {
+        languageView.translatesAutoresizingMaskIntoConstraints = false
+        languageView.backgroundColor = .lightGray
+        languageView.layer.cornerRadius = 10
+        
+        // Add the languageView to the main view
+        view.addSubview(languageView)
+        
+        // Create a vertical stack view for buttons
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .fill // Ensure buttons fill the stack view width
+        stackView.spacing = 1
+        
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add the stackView to the languageView
+        languageView.addSubview(stackView)
+        
+        // Constraints for the languageView (position it under the language select button and match width)
+        NSLayoutConstraint.activate([
+            languageView.topAnchor.constraint(equalTo: langSelectButton.bottomAnchor, constant: 2),
+            languageView.centerXAnchor.constraint(equalTo: langSelectButton.centerXAnchor),
+            languageView.widthAnchor.constraint(equalTo: langSelectButton.widthAnchor), // Match width
+            languageView.heightAnchor.constraint(lessThanOrEqualTo: view.heightAnchor, multiplier: 0.8)
+        ])
+        
+        // Constraints for the stackView (inside the languageView)
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: languageView.topAnchor, constant: 0),
+            stackView.bottomAnchor.constraint(equalTo: languageView.bottomAnchor, constant: 0),
+            stackView.leadingAnchor.constraint(equalTo: languageView.leadingAnchor, constant: 0),
+            stackView.trailingAnchor.constraint(equalTo: languageView.trailingAnchor, constant: 0)
+        ])
+        languageData.removeAll { $0.code == LanguageManager.shared.getCurrentLanguage() }
+        // Add buttons for each language
+        for (index, language) in languageData.enumerated() {
+            let button = UIButton(type: .custom)
+            let flagImage = UIImage(named: language.code)
+            button.setImage(flagImage, for: .normal)
+            button.tag = index // Set a tag to identify the button
+            button.backgroundColor = .white
+            button.layer.borderWidth = 1
+            button.layer.borderColor = UIColor.black.cgColor
+            button.translatesAutoresizingMaskIntoConstraints = false
+            
+            // Add action to the button
+            button.addTarget(self, action: #selector(languageButtonTapped(_:)), for: .touchUpInside)
+            
+            // Add button to the stack view
+            stackView.addArrangedSubview(button)
+        }
+    }
+    
+    @objc func languageButtonTapped(_ sender: UIButton) {
+        languageData.removeAll { $0.code == LanguageManager.shared.getCurrentLanguage() }
+        let selectedLanguage = languageData[sender.tag].code
+        let image = UIImage(named: selectedLanguage)
+        langSelectButton.setImage(image, for: .normal)
+        languageView.isHidden = true
+        showLangView = false
+        
+        LanguageManager.shared.setLanguage(selectedLanguage)
+        NotificationCenter.default.post(name: .languageDidChange, object: nil)
     }
 }
 
@@ -145,56 +280,6 @@ extension MPVolumeView {
     
 }
 
-extension CarNumberViewController {
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-        
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    private func startInactivityTimer() {
-        stopInactivityTimer()
-        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        
-    }
-    
-    private func stopInactivityTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
-    }
-    
-    private func resetInactivityTimer() {
-        stopInactivityTimer()
-        startInactivityTimer()
-    }
-    
-    @objc private func dimScreen() {
-        originalBrightness = UIScreen.main.brightness
-        UIScreen.main.brightness = 0.1
-        print("Screen dimmed to 0.1")
-    }
-    
-    private func restoreBrightness() {
-        UIScreen.main.brightness = originalBrightness
-        print("Screen brightness restored to \(originalBrightness)")
-    }
+extension Notification.Name {
+    static let languageDidChange = Notification.Name("languageDidChange")
 }

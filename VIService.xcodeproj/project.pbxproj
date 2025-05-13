@@ -23,6 +23,10 @@
 		A41AF3252BD65D92005F635F /* Compress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41AF3242BD65D92005F635F /* Compress.swift */; };
 		A473228D2BF324DE00BD8134 /* VideoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A473228C2BF324DE00BD8134 /* VideoListViewController.swift */; };
 		A473228F2BF33A9600BD8134 /* VideoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A473228E2BF33A9600BD8134 /* VideoCell.swift */; };
+		A52E893C2CEACC1700019DDD /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52E893B2CEACC1700019DDD /* LanguageManager.swift */; };
+		A5AE02C72CF0895600AE4D5A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5AE02C52CF0895600AE4D5A /* Localizable.strings */; };
+		A5AF955B2CEB67DB001300DC /* LanguageViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5AF95582CEB67DB001300DC /* LanguageViewCell.swift */; };
+		A5B50E7F2CEB30CE0090A5A9 /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B50E7E2CEB30CE0090A5A9 /* LanguageViewController.swift */; };
 		B529BDD9240944360087DB0E /* iostone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B529BDD7240944360087DB0E /* iostone.mp3 */; };
 		B529BDDA240944360087DB0E /* tone2.wav in Resources */ = {isa = PBXBuildFile; fileRef = B529BDD8240944360087DB0E /* tone2.wav */; };
 		B5C6C240240695EB00333C1A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C6C23F240695EB00333C1A /* Constants.swift */; };
@@ -81,6 +85,20 @@
 		A41AF3242BD65D92005F635F /* Compress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compress.swift; sourceTree = "<group>"; };
 		A473228C2BF324DE00BD8134 /* VideoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoListViewController.swift; sourceTree = "<group>"; };
 		A473228E2BF33A9600BD8134 /* VideoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCell.swift; sourceTree = "<group>"; };
+		A52E893B2CEACC1700019DDD /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
+		A5AE02C02CF0861000AE4D5A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Main.strings; sourceTree = "<group>"; };
+		A5AE02C12CF0865700AE4D5A /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
+		A5AE02C22CF0866B00AE4D5A /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Main.strings; sourceTree = "<group>"; };
+		A5AE02C32CF0868700AE4D5A /* et */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = et; path = et.lproj/Main.strings; sourceTree = "<group>"; };
+		A5AE02C42CF0874900AE4D5A /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
+		A5AE02C62CF0895600AE4D5A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A5AE02C82CF0896200AE4D5A /* et */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = et; path = et.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A5AE02C92CF0896400AE4D5A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A5AE02CA2CF0896500AE4D5A /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A5AE02CB2CF0896600AE4D5A /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A5AE02CC2CF0896700AE4D5A /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A5AF95582CEB67DB001300DC /* LanguageViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewCell.swift; sourceTree = "<group>"; };
+		A5B50E7E2CEB30CE0090A5A9 /* LanguageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageViewController.swift; sourceTree = "<group>"; };
 		A94FD532B23CED4D1396A20E /* Pods-VIService-VIServiceUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VIService-VIServiceUITests.release.xcconfig"; path = "Target Support Files/Pods-VIService-VIServiceUITests/Pods-VIService-VIServiceUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B529BDD7240944360087DB0E /* iostone.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = iostone.mp3; sourceTree = "<group>"; };
 		B529BDD8240944360087DB0E /* tone2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tone2.wav; sourceTree = "<group>"; };
@@ -162,6 +180,9 @@
 				6F94C34D235164C30061D3E5 /* Assets.xcassets */,
 				6F94C34F235164C30061D3E5 /* LaunchScreen.storyboard */,
 				A41AF3242BD65D92005F635F /* Compress.swift */,
+				A52E893B2CEACC1700019DDD /* LanguageManager.swift */,
+				A5AF95582CEB67DB001300DC /* LanguageViewCell.swift */,
+				A5AE02C52CF0895600AE4D5A /* Localizable.strings */,
 			);
 			path = VIService;
 			sourceTree = "<group>";
@@ -225,6 +246,7 @@
 				B5C6C24B2406B11B00333C1A /* CarNumberViewController.swift */,
 				A473228C2BF324DE00BD8134 /* VideoListViewController.swift */,
 				A473228E2BF33A9600BD8134 /* VideoCell.swift */,
+				A5B50E7E2CEB30CE0090A5A9 /* LanguageViewController.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -344,6 +366,11 @@
 			knownRegions = (
 				en,
 				Base,
+				fi,
+				es,
+				sv,
+				et,
+				de,
 			);
 			mainGroup = 6F94C33A235164C10061D3E5;
 			productRefGroup = 6F94C344235164C10061D3E5 /* Products */;
@@ -363,6 +390,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F94C351235164C30061D3E5 /* LaunchScreen.storyboard in Resources */,
+				A5AE02C72CF0895600AE4D5A /* Localizable.strings in Resources */,
 				6F94C34E235164C30061D3E5 /* Assets.xcassets in Resources */,
 				6F94C34C235164C10061D3E5 /* Main.storyboard in Resources */,
 				B529BDD9240944360087DB0E /* iostone.mp3 in Resources */,
@@ -501,6 +529,7 @@
 				6F4A3AB2235571B80082DE36 /* CameraViewController.swift in Sources */,
 				B5C6C2442406967F00333C1A /* ApiResponse.swift in Sources */,
 				B5C6C24A2406B0FB00333C1A /* UploadingViewController.swift in Sources */,
+				A5AF955B2CEB67DB001300DC /* LanguageViewCell.swift in Sources */,
 				B5C6C2422406965300333C1A /* ApiManager.swift in Sources */,
 				B5C6C240240695EB00333C1A /* Constants.swift in Sources */,
 				B5C6C2462406969C00333C1A /* Results.swift in Sources */,
@@ -509,7 +538,9 @@
 				A41AF3252BD65D92005F635F /* Compress.swift in Sources */,
 				A473228D2BF324DE00BD8134 /* VideoListViewController.swift in Sources */,
 				6F4A3ABF235571C50082DE36 /* KYShutterButton.swift in Sources */,
+				A52E893C2CEACC1700019DDD /* LanguageManager.swift in Sources */,
 				B5C6C2482406B09600333C1A /* LandingViewController.swift in Sources */,
+				A5B50E7F2CEB30CE0090A5A9 /* LanguageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,6 +580,11 @@
 			isa = PBXVariantGroup;
 			children = (
 				6F94C34B235164C10061D3E5 /* Base */,
+				A5AE02C02CF0861000AE4D5A /* fi */,
+				A5AE02C12CF0865700AE4D5A /* es */,
+				A5AE02C22CF0866B00AE4D5A /* sv */,
+				A5AE02C32CF0868700AE4D5A /* et */,
+				A5AE02C42CF0874900AE4D5A /* de */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -561,6 +597,19 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		A5AE02C52CF0895600AE4D5A /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A5AE02C62CF0895600AE4D5A /* en */,
+				A5AE02C82CF0896200AE4D5A /* et */,
+				A5AE02C92CF0896400AE4D5A /* fi */,
+				A5AE02CA2CF0896500AE4D5A /* de */,
+				A5AE02CB2CF0896600AE4D5A /* es */,
+				A5AE02CC2CF0896700AE4D5A /* sv */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -568,6 +617,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -629,6 +679,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -686,13 +737,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GG82Q493W;
+				DEVELOPMENT_TEAM = 5GG82Q493W;
 				INFOPLIST_FILE = VIService/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Viserv;
+				INFOPLIST_KEY_CFBundleDisplayName = VISERV;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -703,7 +752,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.viservice;
 				PRODUCT_NAME = VIService;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "VIS-provision";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -715,13 +763,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GG82Q493W;
+				DEVELOPMENT_TEAM = 5GG82Q493W;
 				INFOPLIST_FILE = VIService/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Viserv;
+				INFOPLIST_KEY_CFBundleDisplayName = VISERV;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -729,10 +775,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.viservice;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.viserv;
 				PRODUCT_NAME = VIService;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "VIS-provision";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

@@ -9,7 +9,7 @@
 import Foundation
 
 let BASE_URL = "https://io.viserv.eu/"
-let API_URL = BASE_URL + "backend1/"
+let API_URL = BASE_URL + "backend1"
 let ASSETS_URL = BASE_URL + "uploads/company_img/"
 
 //let UPLOAD_URL = "http://upload.jwplatform.com/v1/videos/upload"

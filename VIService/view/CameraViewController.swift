@@ -10,22 +10,18 @@ import UIKit
 import AVKit
 import AVFoundation
 import SwiftyCam
-//import MBProgressHUD
 import MediaPlayer
 import MobileCoreServices
-//import Photos
+import PhotosUI
 import mobileffmpeg
 
-class CameraViewController: SwiftyCamViewController {
+class CameraViewController: SwiftyCamViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var countdownLabel: UILabel!
     @IBOutlet weak var flashButton: UIButton!
     @IBOutlet weak var datetimeLabel: UILabel!
     @IBOutlet weak var recordButton: KYShutterButton!
     @IBOutlet weak var cancelButton: UIButton!
-
-    var inactivityTimer: Timer?
-    var originalBrightness: CGFloat = UIScreen.main.brightness
 
     var isStarted: Bool = false
     var startedTime: Date = Date()
@@ -48,7 +44,6 @@ class CameraViewController: SwiftyCamViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        startInactivityTimer()
         
         cancelButton.layer.cornerRadius = 5
         if let storedArray = UserDefaults.standard.array(forKey: "recordedVideos") as? [[String]] {
@@ -273,8 +268,31 @@ class CameraViewController: SwiftyCamViewController {
         
         self.performSegue(withIdentifier: "camera_upload", sender: nil)
     }
+    @IBAction func selectVideo(_ sender: Any) {
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        picker.mediaTypes = ["public.movie"] // Only allow video selection
+        picker.sourceType = .photoLibrary
+        present(picker, animated: true)
+        
+        
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            picker.dismiss(animated: true)
+            
+            if let videoURL = info[.mediaURL] as? URL {
+                print("Video URL: \(videoURL)") // Handle the video file URL
+                saveRecordedVideos(url: videoURL)
+            }
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            picker.dismiss(animated: true)
+        }
     
 }
+
 
 extension CameraViewController: SwiftyCamViewControllerDelegate {
     
@@ -334,60 +352,6 @@ extension String {
         return hours * 3600 + minutes * 60 + seconds
     }
     
-}
-
-extension CameraViewController {
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-        
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    private func startInactivityTimer() {
-        stopInactivityTimer()
-        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        
-    }
-    
-    private func stopInactivityTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
-    }
-    
-    private func resetInactivityTimer() {
-        stopInactivityTimer()
-        startInactivityTimer()
-    }
-    
-    @objc private func dimScreen() {
-        originalBrightness = UIScreen.main.brightness
-        UIScreen.main.brightness = 0.1
-        print("Screen dimmed to 0.1")
-    }
-    
-    private func restoreBrightness() {
-        UIScreen.main.brightness = originalBrightness
-        print("Screen brightness restored to \(originalBrightness)")
-    }
 }
 
 

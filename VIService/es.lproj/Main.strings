@@ -1,0 +1,90 @@
+
+/* Class = "UILabel"; text = "Select Language"; ObjectID = "8TU-Sf-gPd"; */
+"8TU-Sf-gPd.text" = "Seleccione idioma";
+
+/* Class = "UILabel"; text = "Car Number"; ObjectID = "8xG-PT-JKe"; */
+"8xG-PT-JKe.text" = "Número de coche";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "Aed-qm-zfk"; */
+"Aed-qm-zfk.normalTitle" = "Cancelar";
+
+/* Class = "UIButton"; normalTitle = "Select"; ObjectID = "DiT-nI-jKC"; */
+"DiT-nI-jKC.normalTitle" = "Seleccionar";
+
+/* Class = "UIButton"; normalTitle = "Select Video"; ObjectID = "DlX-ti-cnz"; */
+"DlX-ti-cnz.normalTitle" = "Seleccionar vídeo";
+
+/* Class = "UILabel"; text = "3:00"; ObjectID = "F0p-5f-auq"; */
+"F0p-5f-auq.text" = "3:00";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Ge5-SF-7Qf"; */
+"Ge5-SF-7Qf.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Login"; ObjectID = "LRs-S8-LxO"; */
+"LRs-S8-LxO.normalTitle" = "Iniciar Sesión";
+
+/* Class = "UILabel"; text = "DEVICE LOGIN"; ObjectID = "OYV-wF-RTW"; */
+"OYV-wF-RTW.text" = "DEVICE LOGIN";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "OqQ-q5-SwB"; */
+"OqQ-q5-SwB.normalTitle" = "Cancelar";
+
+/* Class = "UILabel"; text = "There are no recorded videos."; ObjectID = "PV9-Ox-Fln"; */
+"PV9-Ox-Fln.text" = "No hay videos grabados.";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "Pft-eP-M6s"; */
+"Pft-eP-M6s.normalTitle" = "Cancelar";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Pnf-OL-arn"; */
+"Pnf-OL-arn.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "S6y-Mc-gx6"; */
+"S6y-Mc-gx6.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "ThE-tb-fun"; */
+"ThE-tb-fun.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "UJU-1G-WEb"; */
+"UJU-1G-WEb.normalTitle" = "Button";
+
+/* Class = "UITextField"; placeholder = "Created Date: "; ObjectID = "XL8-ad-1ho"; */
+"XL8-ad-1ho.placeholder" = "Fecha de creación:";
+
+/* Class = "UIButton"; normalTitle = "Next"; ObjectID = "ZhR-h0-P8P"; */
+"ZhR-h0-P8P.normalTitle" = "Adelante";
+
+/* Class = "UIButton"; normalTitle = "List"; ObjectID = "ZpS-fH-puZ"; */
+"ZpS-fH-puZ.normalTitle" = "Lista";
+
+/* Class = "UITextField"; placeholder = "Tech :"; ObjectID = "a5c-oK-AYh"; */
+"a5c-oK-AYh.placeholder" = "Tecnología:";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "brQ-sR-zee"; */
+"brQ-sR-zee.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "Recorded Time"; ObjectID = "e7v-EO-jMf"; */
+"e7v-EO-jMf.text" = "Tiempo registrado";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "ebe-Qc-MmS"; */
+"ebe-Qc-MmS.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Log Out"; ObjectID = "fLZ-5d-oZo"; */
+"fLZ-5d-oZo.normalTitle" = "Cerrar sesión";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "gEC-hb-XQs"; */
+"gEC-hb-XQs.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "sOh-L3-V4n"; */
+"sOh-L3-V4n.normalTitle" = "Cancelar";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "vzl-9b-Nsl"; */
+"vzl-9b-Nsl.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "wTS-zd-3ww"; */
+"wTS-zd-3ww.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Upload"; ObjectID = "xBS-El-jDW"; */
+"xBS-El-jDW.normalTitle" = "Subir video";
+
+/* Class = "UILabel"; text = "date time"; ObjectID = "zwL-DV-wan"; */
+"zwL-DV-wan.text" = "date time";

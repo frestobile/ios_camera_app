@@ -26,7 +26,7 @@ class LandingViewController: UIViewController {
             if ApiManager.isConnectedToInternet {
                 deviceCheck()
             } else {
-                showErrorAlert(title: "Network Error", message: "You are not connected in Network. Please check out the network status.")
+                showErrorAlert(title: LanguageManager.shared.localizedString(for: "network_error"), message: LanguageManager.shared.localizedString(for: "network_status"))
             }
            
         }
@@ -42,7 +42,7 @@ class LandingViewController: UIViewController {
             switch result {
                 case .success(let response):
                     if response.error {
-                        self.showErrorAlert(title: "Error", message: response.msg)
+                        self.showErrorAlert(title: LanguageManager.shared.localizedString(for: "error"), message: response.msg)
                         UserDefaults.standard.removeObject(forKey: "DEVICE_ID")
                         self.performSegue(withIdentifier: "login", sender: nil)
                     } else {
@@ -51,7 +51,7 @@ class LandingViewController: UIViewController {
                         self.performSegue(withIdentifier: "carnumber", sender: nil)
                     }
                 case .failure(let error):
-                    self.showErrorAlert(title: "Error", message: error.localizedDescription)
+                    self.showErrorAlert(title: LanguageManager.shared.localizedString(for: "error"), message: error.localizedDescription)
                 }
             }
     }
@@ -60,7 +60,7 @@ class LandingViewController: UIViewController {
     func showErrorAlert(title: String, message: String) {
         
         let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Try Again", style: .default) { (action:UIAlertAction!) in
+        let okAction = UIAlertAction(title: LanguageManager.shared.localizedString(for: "try_again"), style: .default) { (action:UIAlertAction!) in
             self.deviceCheck()
         }
         alertController.addAction(okAction)

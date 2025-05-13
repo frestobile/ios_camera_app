@@ -17,10 +17,9 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var loginView: UIView!
     @IBOutlet weak var userField: SkyFloatingLabelTextField!
     @IBOutlet weak var passwordField: SkyFloatingLabelTextField!
+    @IBOutlet weak var addressField: SkyFloatingLabelTextField!
     @IBOutlet weak var btnLogin: UIButton!
     
-    var inactivityTimer: Timer?
-    var originalBrightness: CGFloat = UIScreen.main.brightness
     
 //    var connected :Int = 0
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -29,8 +28,8 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        startInactivityTimer()
         btnLogin.layer.cornerRadius = 5
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .languageDidChange, object: nil)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
         tap.delegate = self // This is not required
@@ -39,6 +38,7 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
         requestPermission()
+        updateUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -94,21 +94,51 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
         
         let deviceId = userField.text ?? ""
         let pinPassword = passwordField.text ?? ""
+        let serverUrl = addressField.text ?? ""
         
         if deviceId.isEmpty {
-            showAlert(title: "Error", message: "Please enter device id.")
+            showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: LanguageManager.shared.localizedString(for: "enter_devide_id"))
             return
         } else if pinPassword.isEmpty {
-            showAlert(title: "Error", message: "Please enter pin password.")
+            showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: LanguageManager.shared.localizedString(for: "enter_password"))
+            return
+        } else if serverUrl.isEmpty {
+            showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: LanguageManager.shared.localizedString(for: "server_address_error"))
             return
         }
-
+        
+        if isValidURL("https://\(serverUrl)") {
+            UserDefaults.standard.set("https://\(serverUrl)/backend1", forKey: "SERVER_URL")
+            UserDefaults.standard.set("https://\(serverUrl)/uploads/company_img/", forKey: "ASSET_URL")
+        } else {
+            showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: LanguageManager.shared.localizedString(for: "url_type_error"))
+            return
+        }
+        
         if ApiManager.isConnectedToInternet {
             login(deviceId: deviceId, password: pinPassword)
         } else {
-            self.showAlert(title: "Network Error", message: "You are not connected in Network.  Please check out the network status.")
+            self.showAlert(title: LanguageManager.shared.localizedString(for: "network_error"), message: LanguageManager.shared.localizedString(for: "network_status"))
         }
 
+    }
+    
+    func isValidURL(_ urlString: String) -> Bool {
+        guard let url = URL(string: urlString),
+              UIApplication.shared.canOpenURL(url),
+              let scheme = url.scheme,
+              ["http", "https"].contains(scheme) else {
+            return false
+        }
+        return true
+    }
+    
+    @objc func updateUI() {
+        addressField.placeholder = LanguageManager.shared.localizedString(for: "server_address")
+        userField.placeholder = LanguageManager.shared.localizedString(for: "device_id")
+        passwordField.placeholder = LanguageManager.shared.localizedString(for: "password")
+        btnLogin.setTitle(LanguageManager.shared.localizedString(for: "login"), for: .normal)
+        
     }
     
     func login(deviceId: String, password: String) {
@@ -119,70 +149,27 @@ class LoginViewController: UIViewController, UIGestureRecognizerDelegate {
             switch result {
             case .success(let response):
                 if response.error {
-                    self.showAlert(title: "Error", message: response.msg)
-                } else {
+                    self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: response.msg)
+                } else {                    
+                    self.saveLangToUserDefaults(lang: response.lang)
                     UserDefaults.standard.set(response.url, forKey: "COMPANY_LOGO")
                     UserDefaults.standard.set(deviceId, forKey: "DEVICE_ID")
                     self.performSegue(withIdentifier: "next", sender: nil)
                 }
             case .failure(let error):
-                self.showAlert(title: "Error", message: error.localizedDescription)
+                self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: error.localizedDescription)
             }
         }
     }
-}
-
-extension LoginViewController {
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-        
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    private func startInactivityTimer() {
-        stopInactivityTimer()
-        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        
-    }
-    
-    private func stopInactivityTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
-    }
-    
-    private func resetInactivityTimer() {
-        stopInactivityTimer()
-        startInactivityTimer()
-    }
-    
-    @objc private func dimScreen() {
-        originalBrightness = UIScreen.main.brightness
-        UIScreen.main.brightness = 0.1
-        print("Screen dimmed to 0.1")
-    }
-    
-    private func restoreBrightness() {
-        UIScreen.main.brightness = originalBrightness
-        print("Screen brightness restored to \(originalBrightness)")
+    func saveLangToUserDefaults(lang: [Language]) {
+        do {
+            let encodedData = try JSONEncoder().encode(lang)
+            UserDefaults.standard.set(encodedData, forKey: "LANGUAGES")
+            print("Language data saved successfully.")
+        } catch {
+            print("Error saving lang data to UserDefaults: \(error)")
+        }
     }
 }
 

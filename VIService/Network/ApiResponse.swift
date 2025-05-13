@@ -19,6 +19,7 @@ protocol DeviceResponse: Codable {
     var state: Int { get set }
     var msg: String { get set }
     var url: String { get set }
+    var lang: [Language] {get set }
 }
 
 struct DeviceLoginResponse: DeviceResponse {
@@ -26,6 +27,7 @@ struct DeviceLoginResponse: DeviceResponse {
     var state: Int
     var msg: String
     var url: String
+    var lang: [Language]
 }
 typealias DeviceLoginHandler = (Result<DeviceLoginResponse>) -> ()
 
@@ -54,5 +56,13 @@ struct VideoSuccessResponse : Codable {
     let error : Bool
 }
 typealias VideoSuccessHandler = (Result<VideoSuccessResponse>) -> ()
+
+struct Language: Codable {
+    let id: String
+    let name: String
+    let code: String
+    let status: String
+    
+}
 
 

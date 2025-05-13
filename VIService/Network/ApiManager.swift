@@ -100,7 +100,8 @@ class ApiManager {
 
     
     func videoUpload(deviceId: String, carNumber: String, technician: String, video: URL, progressHandler: @escaping (Double) -> (), completion: @escaping VideoUploadHandler) {
-        let url = API_URL + "upload_video"
+        let server_Url = UserDefaults.standard.string(forKey: "SERVER_URL") ?? API_URL
+        let url = server_Url + "/upload_video"
 
         self.backgroundSessionManager.upload(multipartFormData: { (multipartFormData) in
             let parameters: [String: Any] = [
@@ -134,20 +135,22 @@ class ApiManager {
     }
     
     private func sendApiRequest(command: Command, method: HTTPMethod = .get, headers: HTTPHeaders? = nil, parameters: Parameters? = nil, encoding: ParameterEncoding = URLEncoding.default, completion: @escaping (DataResponse<Data>) -> ()) {
+        let server_Url = UserDefaults.standard.string(forKey: "SERVER_URL") ?? API_URL
         var url = ""
         switch command {
         case .deviceLogin:
-            url = API_URL + "/device_login"
+            url = server_Url + "/device_login"
         case .videoCheck:
-            url = API_URL + "/video_check"
+            url = server_Url + "/video_check"
         case .videoUpload:
-            url = API_URL + "/video_upload"
+            url = server_Url + "/upload_video"
+            
         case .videoCreate:
-            url = API_URL + "/video_create"
+            url = server_Url + "/video_create"
         case .videoSuccess:
-            url = API_URL + "/video_upload_success"
+            url = server_Url + "/video_upload_success"
         case .deviceCheck:
-            url = API_URL + "/device_status"
+            url = server_Url + "/device_status"
         }
         
         sessionManager.request(url, method: method, parameters: parameters, encoding: encoding, headers: headers).responseData { (response) in

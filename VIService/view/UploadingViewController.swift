@@ -23,9 +23,6 @@ class UploadingViewController: UIViewController, LogDelegate {
     @IBOutlet weak var companyLogo: UIImageView!
     @IBOutlet weak var dateTextField: SkyFloatingLabelTextField!
     
-    var inactivityTimer: Timer?
-    var originalBrightness: CGFloat = UIScreen.main.brightness
-    
     var deviceId : String = ""
     var carNumber : String = ""
     var technician : String = ""
@@ -45,14 +42,15 @@ class UploadingViewController: UIViewController, LogDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let logoUrl = UserDefaults.standard.string(forKey: "COMPANY_LOGO")!
-        let imageURL = URL(string: ASSETS_URL + logoUrl)!
+        let assetUrl = UserDefaults.standard.string(forKey: "ASSET_URL") ?? ASSETS_URL
+        let imageURL = URL(string: assetUrl + logoUrl)!
         
         companyLogo.loadImage(fromURL: imageURL)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        startInactivityTimer()
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .languageDidChange, object: nil)
         
         deviceId = UserDefaults.standard.string(forKey: "DEVICE_ID") ?? ""
         isCameraUsed = UserDefaults.standard.bool(forKey: "CAMERA_USED")
@@ -79,9 +77,18 @@ class UploadingViewController: UIViewController, LogDelegate {
         
         carNumber = carNumberTextField.text ?? ""
         technician = technicianTextField.text ?? ""
+        
+        updateUI()
 
     }
     
+    @objc func updateUI() {
+        carNumberTextField.placeholder = LanguageManager.shared.localizedString(for: "car_number")
+        technicianTextField.placeholder = LanguageManager.shared.localizedString(for: "tech")
+        dateTextField.placeholder = LanguageManager.shared.localizedString(for: "created_date")
+        uploadButton.setTitle(LanguageManager.shared.localizedString(for: "upload"), for: .normal)
+        deleteButton.setTitle(LanguageManager.shared.localizedString(for: "delete"), for: .normal)
+    }
     
     func showAlert(title: String, message: String, handler: (() -> Void)? = nil) {
         let alert = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
@@ -98,11 +105,11 @@ class UploadingViewController: UIViewController, LogDelegate {
     }
     
     @IBAction func deleteButtonPressed(_ sender: Any) {
-        let alert = UIAlertController.init(title: "", message: "Do you want to cancel uploading?", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "No", style: .cancel) { (alertAction) in
+        let alert = UIAlertController.init(title: "", message: LanguageManager.shared.localizedString(for: "cancel_uploading"), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: LanguageManager.shared.localizedString(for: "no"), style: .cancel) { (alertAction) in
             
         })
-        alert.addAction(UIAlertAction(title: "Yes", style: .default) { (alertAction) in
+        alert.addAction(UIAlertAction(title: LanguageManager.shared.localizedString(for: "yes"), style: .default) { (alertAction) in
 //            self.deleteFile(url: self.videoUrl!)
             if self.compressedUrl != nil {
                 self.deleteFile(url: self.compressedUrl!)
@@ -119,7 +126,7 @@ class UploadingViewController: UIViewController, LogDelegate {
     
     @IBAction func uploadButtonPressed(_ sender: Any) {
         
-        if self.uploadButton.currentTitle == "Resend video" {
+        if self.uploadButton.currentTitle == LanguageManager.shared.localizedString(for: "resend_video"){
             MBProgressHUD.showAdded(to: view, animated: true)
             
             ApiManager.shared.videoCheck(deviceId: deviceId, carNumber: carNumber) { (result) in
@@ -127,7 +134,7 @@ class UploadingViewController: UIViewController, LogDelegate {
                 switch result {
                 case .success(let response):
                     if response.error {
-                        self.showAlert(title: "Error", message: response.msg) {
+                        self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: response.msg) {
 //                            self.deleteFile(url: self.videoUrl!)
                             if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
                                 self.navigationController?.setViewControllers([viewController], animated: true)
@@ -137,7 +144,7 @@ class UploadingViewController: UIViewController, LogDelegate {
                         self.videoUpload(deviceId: self.deviceId, carNumber: self.carNumber, technician: self.technician)
                     }
                 case .failure(let error):
-                    self.showAlert(title: "Error", message: error.localizedDescription) {
+                    self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: error.localizedDescription) {
                         if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
                             self.navigationController?.setViewControllers([viewController], animated: true)
                         }
@@ -153,7 +160,7 @@ class UploadingViewController: UIViewController, LogDelegate {
                     switch result {
                         case .success(let response):
                             if response.error {
-                                self.showAlert(title: "Error", message: response.msg) {
+                                self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: response.msg) {
                                     if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
                                         self.navigationController?.setViewControllers([viewController], animated: true)
                                     }
@@ -162,7 +169,7 @@ class UploadingViewController: UIViewController, LogDelegate {
                                 self.compressVideoWithProgress(inputURL: self.videoUrl!)
                             }
                         case .failure(let error):
-                            self.showAlert(title: "Error", message: error.localizedDescription) {
+                            self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: error.localizedDescription) {
                                 if let viewController = self.storyboard?.instantiateViewController(withIdentifier: "CarNumberViewController") {
                                     self.navigationController?.setViewControllers([viewController], animated: true)
                                 }
@@ -182,10 +189,10 @@ class UploadingViewController: UIViewController, LogDelegate {
         UIApplication.shared.isIdleTimerDisabled = true
         self.progressingView = MBProgressHUD.showAdded(to: view, animated: true)
         self.progressingView.mode = .indeterminate
-        self.progressingView.label.text = "Uploading..."
+        self.progressingView.label.text = LanguageManager.shared.localizedString(for: "uploading")
         
         ApiManager.shared.videoUpload(deviceId: deviceId, carNumber: carNumber, technician: technician, video: compressedUrl!, progressHandler: { (progress) in
-            self.progressingView.label.text = "Uploading... \(Int(progress * 100))%"
+            self.progressingView.label.text = "\(LanguageManager.shared.localizedString(for: "uploading")) \(Int(progress * 100))%"
             }) { (result) in
             UIApplication.shared.isIdleTimerDisabled = false
                 
@@ -193,10 +200,10 @@ class UploadingViewController: UIViewController, LogDelegate {
             switch result {
             case .success(let response):
                 if response.error {
-                    self.uploadButton.setTitle("Resend video", for: .normal)
-                    self.showAlert(title: "Error", message: "Upload Failed, Try again later.")
+                    self.uploadButton.setTitle(LanguageManager.shared.localizedString(for: "resend_video"), for: .normal)
+                    self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: LanguageManager.shared.localizedString(for: "upload_failed"))
                 } else {
-                    self.showAlert(title: "", message: "Video upload done") {
+                    self.showAlert(title: "", message: LanguageManager.shared.localizedString(for: "upload_done")) {
 //                        self.deleteFile(url: self.videoUrl!)
                         self.deleteFile(url: self.compressedUrl!)
                         UserDefaults.standard.removeObject(forKey: "selectedVideo")
@@ -207,9 +214,9 @@ class UploadingViewController: UIViewController, LogDelegate {
                     }
                 }
             case .failure(let error):
-                self.uploadButton.setTitle("Resend video", for: .normal)
+                self.uploadButton.setTitle(LanguageManager.shared.localizedString(for: "resend_video"), for: .normal)
                 if error._code == NSURLErrorTimedOut {
-                    self.showAlert(title: "Error", message: error.localizedDescription)
+                    self.showAlert(title: LanguageManager.shared.localizedString(for: "error"), message: error.localizedDescription)
                 }
                 print(error)
                 
@@ -232,7 +239,7 @@ class UploadingViewController: UIViewController, LogDelegate {
             let progress = Float(time / duration)
             print("progress: \(progress)==== \(duration)/\(time)")
             DispatchQueue.main.async {
-                self.progressingView.label.text = "Compressing... \(Int(progress * 100))%"
+                self.progressingView.label.text = "\(LanguageManager.shared.localizedString(for: "compressing")) \(Int(progress * 100))%"
             }
             
         }
@@ -278,7 +285,7 @@ extension UploadingViewController {
     func compressVideoWithProgress(inputURL: URL) {
         progressingView = MBProgressHUD.showAdded(to: view, animated: true)
         progressingView.mode = .indeterminate
-        progressingView.label.text = "Compressing..."
+        progressingView.label.text = LanguageManager.shared.localizedString(for: "compressing")
         
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         self.compressedUrl = documentsDirectory.appendingPathComponent("\(carNumber)_\(generateRandomString(length: 20)).mp4")
@@ -327,74 +334,19 @@ extension UploadingViewController {
     }
     
     func errorAlert(url : URL) {
-        let message = NSLocalizedString("Something goes wrong during compress recorded video. Try Again?", comment: "")
-        let alertController = UIAlertController(title: "Compress Video", message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Yes", style: .default) { (action:UIAlertAction!) in
+        let message = LanguageManager.shared.localizedString(for: "compress_error")
+        let alertController = UIAlertController(title: LanguageManager.shared.localizedString(for: "compress_video"), message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: LanguageManager.shared.localizedString(for: "yes"), style: .default) { (action:UIAlertAction!) in
             
             self.compressVideoWithProgress(inputURL: url)
         }
         
-        let cancelAction = UIAlertAction(title: "No", style: .cancel) { (action:UIAlertAction!) in
+        let cancelAction = UIAlertAction(title: LanguageManager.shared.localizedString(for: "no"), style: .cancel) { (action:UIAlertAction!) in
             print("Cancel button tapped")
         }
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
         
         self.present(alertController, animated: true, completion: nil)
-    }
-}
-
-
-extension UploadingViewController {
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-                resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-                resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-                resetInactivityTimer()
-                restoreBrightness()
-        
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
-                resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    private func startInactivityTimer() {
-                stopInactivityTimer()
-                inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-
-    }
-    
-    private func stopInactivityTimer() {
-                inactivityTimer?.invalidate()
-                inactivityTimer = nil
-    }
-    
-    private func resetInactivityTimer() {
-        stopInactivityTimer()
-        startInactivityTimer()
-    }
-    
-    @objc private func dimScreen() {
-        originalBrightness = UIScreen.main.brightness
-        UIScreen.main.brightness = 0.1
-        print("Screen dimmed to 0.1")
-    }
-    
-    private func restoreBrightness() {
-        UIScreen.main.brightness = originalBrightness
-        print("Screen brightness restored to \(originalBrightness)")
     }
 }

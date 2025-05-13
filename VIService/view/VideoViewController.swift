@@ -25,9 +25,6 @@ class VideoViewController: UIViewController {
     @IBOutlet weak var backgroundImg: UIImageView!
 
     var playerLayer: AVPlayerLayer!
-    
-    var inactivityTimer: Timer?
-    var originalBrightness: CGFloat = UIScreen.main.brightness
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .landscape
@@ -35,8 +32,7 @@ class VideoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        startInactivityTimer()
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateUI), name: .languageDidChange, object: nil)
         if let storedArray = UserDefaults.standard.array(forKey: "selectedVideo") as? [String] {
             self.selectedVideo = storedArray
             
@@ -50,7 +46,7 @@ class VideoViewController: UIViewController {
         playButton.setTitle("", for: .normal)
         backgroundImg.image = UIImage(named: "play_blue")
         
-        
+        updateUI()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -81,6 +77,11 @@ class VideoViewController: UIViewController {
         }
     }
     
+    @objc func updateUI() {
+        chooseButton.setTitle(LanguageManager.shared.localizedString(for: "select"), for: .normal)
+        cancelButton.setTitle(LanguageManager.shared.localizedString(for: "cancel"), for: .normal)
+    }
+    
     @IBAction func cancelButtonTapped(_ sender: Any) {
         player.pause()
         UserDefaults.standard.removeObject(forKey: "selectedVideo")
@@ -103,58 +104,5 @@ class VideoViewController: UIViewController {
             backgroundImg.image = UIImage(named: "pause_blue")
         }
         
-    }
-}
-extension VideoViewController {
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesMoved(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesEnded(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-        
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesCancelled(touches, with: event)
-        resetInactivityTimer()
-                restoreBrightness()
-    }
-    
-    private func startInactivityTimer() {
-        stopInactivityTimer()
-        inactivityTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(dimScreen), userInfo: nil, repeats: false)
-        
-    }
-    
-    private func stopInactivityTimer() {
-        inactivityTimer?.invalidate()
-        inactivityTimer = nil
-    }
-    
-    private func resetInactivityTimer() {
-        stopInactivityTimer()
-        startInactivityTimer()
-    }
-    
-    @objc private func dimScreen() {
-        originalBrightness = UIScreen.main.brightness
-        UIScreen.main.brightness = 0.1
-        print("Screen dimmed to 0.1")
-    }
-    
-    private func restoreBrightness() {
-        UIScreen.main.brightness = originalBrightness
-        print("Screen brightness restored to \(originalBrightness)")
     }
 }
